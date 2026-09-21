@@ -1,0 +1,38 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache and byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Vector database storage & local DBs
+chroma_db/
+*.sqlite3
+
+# Logs & temporary files
+*.log
+*.tmp
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE and editor settings
+.vscode/
+.idea/
+.claude/
+*.sublime-project
+*.sublime-workspace
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
