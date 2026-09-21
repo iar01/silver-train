@@ -62,6 +62,7 @@ rag-chat-bot/
 │   ├── evaluate.py        # Automated RAG evaluation using Ragas
 │   ├── test_dataset.json  # Benchmark questions and ground-truth references
 │   └── __init__.py
+├── app.py                 # FastAPI REST API (query & PDF upload endpoints)
 ├── chunking.py            # Parent-Document Retriever setup & chunk splitters
 ├── config.py              # Centralized environment variables, model IDs & directory paths
 ├── database.py            # ChromaDB client & vector store initialization
@@ -69,7 +70,7 @@ rag-chat-bot/
 ├── main.py                # Interactive CLI chef chatbot interface
 ├── pipeline.py            # Modular RAG pipeline (retrieval + QA chain)
 ├── retrieval.py           # Hybrid retrieval (BM25 + Vector) and FlashRank reranking
-├── setup_db.py            # Standalone database ingestion utility
+├── ui.py                  # Streamlit Web User Interface with PDF upload manager
 ├── requirements.txt       # Project dependencies
 ├── .env.example           # Template for environment variables
 └── .gitignore             # Git exclusion rules
@@ -134,9 +135,9 @@ python ingest.py
 
 This parses the PDFs with `PyMuPDF` and builds the parent-child vector index inside `./chroma_db1`.
 
-### Step 2: Run the Chatbot
+### Step 2: Run via Terminal CLI
 
-Start the interactive chef assistant:
+Start the interactive chef assistant in your terminal:
 
 ```bash
 python main.py
@@ -149,7 +150,21 @@ Ask questions such as:
 
 Type `exit` or `quit` to end the session.
 
-### Step 3: Run RAG Evaluation
+### Step 3: Run the Web Application (FastAPI + Streamlit)
+
+You can run the interactive web interface with dynamic PDF upload and citation expansion:
+
+1. **Start the FastAPI Backend:**
+   ```bash
+   uvicorn app:app --reload --port 8000
+   ```
+2. **Start the Streamlit Frontend (in a new terminal):**
+   ```bash
+   streamlit run ui.py
+   ```
+3. Open `http://localhost:8501` in your browser. You can chat with the assistant and upload new recipe PDFs directly from the sidebar.
+
+### Step 4: Run RAG Evaluation
 
 Evaluate the retrieval and generation performance using Ragas:
 

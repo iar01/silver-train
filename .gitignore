@@ -17,6 +17,7 @@ __pycache__/
 # Vector database storage & local DBs
 chroma_db*/
 *.sqlite3
+data/recipe_pdfs/
 
 # Logs & temporary files
 *.log

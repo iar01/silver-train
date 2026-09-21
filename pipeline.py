@@ -18,19 +18,7 @@ class RAGPipeline:
         self.base_retriever = setup_parent_child_retriever()
 
         # 2. Load documents for keyword BM25 search
-        self.docs = []
-        if os.path.exists(DATA_DIRECTORY):
-            pdf_files = [
-                os.path.join(DATA_DIRECTORY, f)
-                for f in os.listdir(DATA_DIRECTORY)
-                if f.lower().endswith(".pdf")
-            ]
-            for file in pdf_files:
-                try:
-                    loader = PyMuPDFLoader(file)
-                    self.docs.extend(loader.load())
-                except Exception as e:
-                    print(f"Warning: Failed to load {file}: {e}")
+        self.docs = self.load_documents()
 
         # 3. Build Advanced Search Pipeline (BM25 + Vector + FlashRank)
         self.retriever = build_advanced_retriever(self.docs, self.base_retriever)
@@ -46,7 +34,7 @@ class RAGPipeline:
         )
         self.chat_model = ChatHuggingFace(llm=llm)
 
-        prompt = PromptTemplate.from_template("""
+        self.prompt = PromptTemplate.from_template("""
 You are an expert chef assistant. Use the provided recipe context to answer the user.
 If the ingredients aren't in the context, say you don't know.
 
@@ -58,7 +46,49 @@ Answer:""")
             llm=self.chat_model,
             retriever=self.retriever,
             return_source_documents=True,
-            chain_type_kwargs={"prompt": prompt},
+            chain_type_kwargs={"prompt": self.prompt},
+        )
+
+    def load_documents(self):
+        """Loads all PDFs recursively from DATA_DIRECTORY."""
+        docs = []
+        if os.path.exists(DATA_DIRECTORY):
+            pdf_files = []
+            for root, _, files in os.walk(DATA_DIRECTORY):
+                for f in files:
+                    if f.lower().endswith(".pdf"):
+                        pdf_files.append(os.path.join(root, f))
+            for file in pdf_files:
+                try:
+                    loader = PyMuPDFLoader(file)
+                    docs.extend(loader.load())
+                except Exception as e:
+                    print(f"Warning: Failed to load {file}: {e}")
+        return docs
+
+    def reload_documents(self, new_file_path: str = None):
+        """Re-indexes newly added documents and rebuilds retriever and QA chain."""
+        if new_file_path and os.path.exists(new_file_path):
+            try:
+                loader = PyMuPDFLoader(new_file_path)
+                new_docs = loader.load()
+                if new_docs:
+                    self.base_retriever.add_documents(new_docs)
+            except Exception as e:
+                print(f"Warning: Failed to add new docs to vector store: {e}")
+
+        # Reload all documents for BM25 keyword search
+        self.docs = self.load_documents()
+
+        # Rebuild advanced retriever
+        self.retriever = build_advanced_retriever(self.docs, self.base_retriever)
+
+        # Rebuild QA chain with the updated retriever
+        self.qa_chain = RetrievalQA.from_chain_type(
+            llm=self.chat_model,
+            retriever=self.retriever,
+            return_source_documents=True,
+            chain_type_kwargs={"prompt": self.prompt},
         )
 
     def answer(self, question: str):
