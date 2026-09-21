@@ -1,0 +1,10 @@
+[
+    {
+        "question": "How do I make traditional hummus from scratch?",
+        "ground_truth": "To make traditional hummus, blend cooked chickpeas, tahini, garlic, lemon juice, olive oil, and salt until smooth."
+    },
+    {
+        "question": "What items do I need for garlic sauce?",
+        "ground_truth": "You need garlic cloves, neutral oil, lemon juice, and salt."
+    }
+]

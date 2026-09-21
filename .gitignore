@@ -15,7 +15,7 @@ __pycache__/
 *$py.class
 
 # Vector database storage & local DBs
-chroma_db/
+chroma_db*/
 *.sqlite3
 
 # Logs & temporary files

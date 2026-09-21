@@ -10,6 +10,8 @@ def build_advanced_retriever(documents,vector_retriever):
     """ Combines MB25 and vector search, then applies FlashRank re-ranking """
 
     # 1. BM25 Keyword retriever (Great for exact ingredient names)
+    if not documents:
+        raise ValueError("Cannot build BM25 retriever: no documents were loaded. Please make sure PDFs are placed in the data folder.")
     bm25_retriever = BM25Retriever.from_documents(documents)
     bm25_retriever.k = 5
 
